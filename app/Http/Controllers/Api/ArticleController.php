@@ -14,6 +14,8 @@ use App\Models\Article;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
+use App\Models\User;
+
 class ArticleController extends Controller
 {
     use SoftDeletes;
@@ -44,7 +46,7 @@ class ArticleController extends Controller
         // $userIds = array_merge([$user->id], $request->user_ids);
 
         if ($article->save()) {
-            $article->users()->attach(\App\Models\User::find([1,2]));
+            $article->users()->attach(User::find([1,2]));
 
             return new JsonResponse(['message' => 'Статья добавлена']);
         }
@@ -84,7 +86,7 @@ class ArticleController extends Controller
     public function update(Request $request, int $id)
     {
         $article = Article::find($id);
-        dd($article, $article->users);
+        // dd($article, $article->users);
         $article->text = $request->text;
 
         if ($article->save()) {
