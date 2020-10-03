@@ -3,62 +3,46 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
+
+use Illuminate\Http\JsonResponse;
+
+use Exception;
+
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+
+use App\Http\Requests\Api\User\UserUpdateRequest;
 
 class UserController extends Controller
 {
     /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @param UserUpdateRequest $request
+     * @return JsonResponse
      */
-    public function update(Request $request, $id)
+    public function update(UserUpdateRequest $request)
     {
-        //
-    }
+        $user = Auth::user();
+        $input = $request->validated();
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        try {
+            $user->name = $input['name'];
+            $user->first_name = $input['first_name'];
+            $user->last_name = $input['last_name'];
+            $user->email = $input['email'];
+            $user->phone = $input['phone'];
+            $user->save();
+
+            // Auth::user()->update($request->validated()); -- хотел сделать через $guarded = [] для краткости,
+            // но обновлялся только email
+
+        } catch (Exception $e) {
+            Log::debug($e->getMessage());
+
+            return new JsonResponse(['message' => 'Ошибка', 'error' => "{$e->getMessage()}"], 422);
+        }
+
+        return new JsonResponse(['message' => 'Success']);
     }
 }

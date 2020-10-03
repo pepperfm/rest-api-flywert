@@ -11,6 +11,8 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
+    // protected $guarded = [];
+
     /**
      * The attributes that are mass assignable.
      *
@@ -44,6 +46,11 @@ class User extends Authenticatable
     public static function findByToken($token)
     {
         return self::where('remember_token', $token)->first();
+    }
+
+    public function isAuthor($usersIds)
+    {
+        return in_array($this->id, $usersIds);
     }
 
     public function articles()

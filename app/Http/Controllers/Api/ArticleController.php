@@ -19,15 +19,6 @@ use App\Models\User;
 class ArticleController extends Controller
 {
     use SoftDeletes;
-    /**
-     * Display a listing of the resource.
-     *
-     * @return JsonResponse
-     */
-    public function index()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -38,15 +29,12 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        $user = Auth::user();
-
         $article = new Article;
         $article->text = $request->text;
-
-        // $userIds = array_merge([$user->id], $request->user_ids);
+        $userIds = array_merge([Auth::user()->id], $request->user_ids);
 
         if ($article->save()) {
-            $article->users()->attach(User::find([1,2]));
+            $article->users()->attach(User::find($userIds));
 
             return new JsonResponse(['message' => 'Статья добавлена']);
         }
@@ -86,7 +74,13 @@ class ArticleController extends Controller
     public function update(Request $request, int $id)
     {
         $article = Article::find($id);
-        // dd($article, $article->users);
+
+        // если список статей выводился бы куда-то на фронт в админку, то я вижу, как это сделать через политики.
+        // а тут как иначе сделать, кроме такой проверки, т.к. это апи, я не додумался
+        if (!Auth::user()->isAuthor($article->users->pluck('id'))) {
+            return new JsonResponse(['message' => 'Не ваша статья'], 403);
+        }
+
         $article->text = $request->text;
 
         if ($article->save()) {
@@ -106,6 +100,11 @@ class ArticleController extends Controller
     public function destroy(int $id)
     {
         $article = Article::find($id);
+
+        if (Auth::user()->isAuthor($article->users->pluck('id'))) {
+            return new JsonResponse(['message' => 'Не ваша статья'], 403);
+        }
+
         try {
             $article->users()->detach();
             $article->delete();
