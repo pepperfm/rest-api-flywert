@@ -9,6 +9,15 @@ class Article extends Model
 {
     use HasFactory;
 
+    public function getUser(User $user) // : bool|null
+    {
+        if (!$this) {
+            return null; // сомнительно в целом возвращать null
+        }
+
+        return $user->isAuthor($this->users->pluck('id'));
+    }
+
     public function users()
     {
         return $this->belongsToMany(User::class);
