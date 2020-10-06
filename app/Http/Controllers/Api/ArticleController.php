@@ -77,7 +77,7 @@ class ArticleController extends Controller
 
         // если список статей выводился бы куда-то на фронт в админку, то я вижу, как это сделать через политики.
         // а тут как иначе сделать, кроме такой проверки, т.к. это апи, я не додумался
-        if (!Auth::user()->isAuthor($article->users->pluck('id'))) {
+        if (!Auth::user()->isAuthor($article)) {
             return new JsonResponse(['message' => 'Не ваша статья'], 403);
         }
 
@@ -101,7 +101,7 @@ class ArticleController extends Controller
     {
         $article = Article::find($id);
 
-        if (Auth::user()->isAuthor($article->users->pluck('id'))) {
+        if (Auth::user()->isAuthor($article)) {
             return new JsonResponse(['message' => 'Не ваша статья'], 403);
         }
 

@@ -48,9 +48,9 @@ class User extends Authenticatable
         return self::where('remember_token', $token)->first();
     }
 
-    public function isAuthor($usersIds)
+    public function isAuthor(Article $article)
     {
-        return in_array($this->id, $usersIds);
+        return in_array($this->id, $article->users->pluck('id'));
     }
 
     public function articles()

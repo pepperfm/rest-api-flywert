@@ -23,7 +23,10 @@ abstract class BaseApiRequest extends FormRequest
      *
      * @return bool
      */
-    abstract public function authorize();
+    protected function authorize()
+    {
+        return true;
+    }
 
     /**
      * Handle a failed validation attempt.

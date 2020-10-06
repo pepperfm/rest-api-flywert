@@ -15,7 +15,7 @@ class Article extends Model
             return null; // сомнительно в целом возвращать null
         }
 
-        return $user->isAuthor($this->users->pluck('id'));
+        return $user->isAuthor($this);
     }
 
     public function users()
